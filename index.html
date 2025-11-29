@@ -11,6 +11,11 @@
   <div id="errorBanner" class="banner" hidden></div>
   <header class="nav">
     <div class="brand">Elderly Assist</div>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#about">About</a>
+      <a href="#how">How To Use</a>
+      <a href="#benefits">Benefits</a>
+    </nav>
   </header>
   <main class="container">
     <div class="hero">
@@ -44,6 +49,10 @@
       <button class="action-btn" data-phrase="Book appointment with Dr Smith on December 5 at 3 pm">Book Appointment</button>
       <button class="action-btn" data-phrase="Remind medication at 8 am">Medication Reminder</button>
       <button class="action-btn" data-phrase="What can I say">What can I say</button>
+      <button class="action-btn" data-phrase="Add milk to shopping list">Add Milk to Shopping</button>
+      <button class="action-btn" data-phrase="Find nearest pharmacy">Find Pharmacy</button>
+      <button class="action-btn" data-phrase="Call help">Call Help</button>
+      <button class="action-btn" data-phrase="Read my schedule">Read My Schedule</button>
     </section>
     <section class="cards">
       <div class="card">
@@ -53,6 +62,23 @@
       <div class="card">
         <h2>Medication Reminders</h2>
         <ul id="remindersList"></ul>
+      </div>
+      <div class="card">
+        <h2>Shopping List</h2>
+        <div class="field">
+          <input id="shoppingInput" type="text" placeholder="Add item" aria-label="Add shopping item" />
+          <button id="addShoppingBtn" class="primary">Add</button>
+          <button id="clearShoppingBtn" class="secondary">Clear</button>
+        </div>
+        <ul id="shoppingList"></ul>
+      </div>
+      <div class="card">
+        <h2>Help Contact</h2>
+        <div class="field">
+          <input id="helpPhone" type="tel" placeholder="Phone number" aria-label="Help contact phone" />
+          <button id="saveHelpContact" class="primary">Save</button>
+        </div>
+        <p id="helpContactStatus"></p>
       </div>
     </section>
     <section class="notice" id="supportNotice" hidden>
@@ -65,7 +91,34 @@
         <button id="overlayRetry" class="primary">Try Again</button>
       </div>
     </div>
+    <section id="about" class="info">
+      <h2>About Us</h2>
+      <p>We help older adults do essential tasks without a screen. Speak naturally to book appointments, set medication reminders, manage shopping, and reach family help.</p>
+    </section>
+    <section id="how" class="info">
+      <h2>How To Use</h2>
+      <ul>
+        <li>Tap the big mic button and allow microphone access.</li>
+        <li>Say a simple command like “Book appointment with Dr Smith on December 5 at 3 pm”.</li>
+        <li>Use large action buttons if voice isn’t available.</li>
+        <li>Save a help contact number, then say “Call help”.</li>
+      </ul>
+    </section>
+    <section id="benefits" class="info">
+      <h2>Benefits</h2>
+      <ul>
+        <li>No tiny text or complex menus—just clear voice.</li>
+        <li>Fast access to appointments, medications, shopping, and help.</li>
+        <li>Works with family support via a saved phone contact.</li>
+        <li>Privacy-friendly: data stored locally on your device.</li>
+      </ul>
+    </section>
   </main>
+  <footer class="footer">
+    <div class="container">
+      <p>© Elderly Assist</p>
+    </div>
+  </footer>
   <script src="app.js"></script>
 </body>
 </html>
