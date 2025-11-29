@@ -1,4 +1,4 @@
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synth = window.speechSynthesis;
 const sayHelpBtn = document.getElementById('sayHelp');
 const bubble = document.getElementById('voiceBubble');
@@ -30,8 +30,15 @@ function speak(text) {
 function loadData() {
   const a = JSON.parse(localStorage.getItem('appointments') || '[]');
   const r = JSON.parse(localStorage.getItem('reminders') || '[]');
+  const s = JSON.parse(localStorage.getItem('shopping') || '[]');
+  const hp = localStorage.getItem('helpContact') || '';
   renderAppointments(a);
   renderReminders(r);
+  renderShopping(s);
+  const helpPhoneInput = document.getElementById('helpPhone');
+  const helpContactStatus = document.getElementById('helpContactStatus');
+  if (helpPhoneInput) helpPhoneInput.value = hp;
+  if (helpContactStatus) helpContactStatus.textContent = hp ? `Saved: ${hp}` : 'No phone saved';
 }
 function saveAppointments(items) {
   localStorage.setItem('appointments', JSON.stringify(items));
@@ -73,6 +80,29 @@ function renderReminders(items) {
     li.appendChild(document.createTextNode(' '));
     li.appendChild(del);
     remindersList.appendChild(li);
+  });
+}
+function saveShopping(items) {
+  localStorage.setItem('shopping', JSON.stringify(items));
+}
+function renderShopping(items) {
+  const list = document.getElementById('shoppingList');
+  if (!list) return;
+  list.innerHTML = '';
+  items.forEach((it, idx) => {
+    const li = document.createElement('li');
+    li.textContent = it;
+    const del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.className = 'secondary';
+    del.onclick = () => {
+      const next = items.slice(0, idx).concat(items.slice(idx + 1));
+      saveShopping(next);
+      renderShopping(next);
+    };
+    li.appendChild(document.createTextNode(' '));
+    li.appendChild(del);
+    list.appendChild(li);
   });
 }
 function parseTimePhrase(text) {
@@ -159,6 +189,53 @@ function handleCommand(text) {
     }
     return;
   }
+  if (lower.includes('add') && lower.includes('shopping')) {
+    const m = text.match(/add\s+(.+?)\s+to\s+shopping\s+list/i) || text.match(/add\s+(.+?)\s*(?:list)?/i);
+    const item = m ? m[1].trim() : '';
+    if (item) {
+      const items = JSON.parse(localStorage.getItem('shopping') || '[]');
+      items.push(item);
+      saveShopping(items);
+      renderShopping(items);
+      speak(`${item} added to shopping`);
+    } else {
+      speak('Please say, add milk to shopping list');
+    }
+    return;
+  }
+  if ((lower.includes('remove') || lower.includes('delete')) && lower.includes('shopping')) {
+    const m = text.match(/(?:remove|delete)\s+(.+?)\s+from\s+shopping\s+list/i) || text.match(/(?:remove|delete)\s+(.+?)/i);
+    const item = m ? m[1].trim() : '';
+    const items = JSON.parse(localStorage.getItem('shopping') || '[]');
+    const idx = items.findIndex(x => x.toLowerCase() === item.toLowerCase());
+    if (idx >= 0) {
+      const next = items.slice(0, idx).concat(items.slice(idx + 1));
+      saveShopping(next);
+      renderShopping(next);
+      speak(`${item} removed`);
+    } else {
+      speak('Item not found');
+    }
+    return;
+  }
+  if (lower.includes('clear') && lower.includes('shopping')) {
+    saveShopping([]);
+    renderShopping([]);
+    speak('Shopping list cleared');
+    return;
+  }
+  if (lower.includes('find') && lower.includes('pharmacy')) {
+    findPharmacy();
+    return;
+  }
+  if (lower.includes('call help')) {
+    callHelp();
+    return;
+  }
+  if (lower.includes('read my schedule')) {
+    speakSchedule();
+    return;
+  }
 }
 function initRecognition() {
   if (!SpeechRecognition) {
@@ -225,6 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initRecognition();
   loadData();
   initChips();
+  initShoppingControls();
+  initHelpContactControls();
 });
 
 async function startMeter() {
@@ -273,6 +352,75 @@ function initChips() {
       }
     });
   });
+}
+
+function initShoppingControls() {
+  const input = document.getElementById('shoppingInput');
+  const addBtn = document.getElementById('addShoppingBtn');
+  const clearBtn = document.getElementById('clearShoppingBtn');
+  if (addBtn) addBtn.addEventListener('click', () => {
+    const text = (input && input.value || '').trim();
+    if (!text) return;
+    const items = JSON.parse(localStorage.getItem('shopping') || '[]');
+    items.push(text);
+    saveShopping(items);
+    renderShopping(items);
+    if (input) input.value = '';
+    speak(`${text} added to shopping list`);
+  });
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    saveShopping([]);
+    renderShopping([]);
+    speak('Shopping list cleared');
+  });
+}
+
+function initHelpContactControls() {
+  const input = document.getElementById('helpPhone');
+  const saveBtn = document.getElementById('saveHelpContact');
+  const status = document.getElementById('helpContactStatus');
+  if (saveBtn) saveBtn.addEventListener('click', () => {
+    const val = (input && input.value || '').trim();
+    localStorage.setItem('helpContact', val);
+    if (status) status.textContent = val ? `Saved: ${val}` : 'No phone saved';
+    speak('Help contact saved');
+  });
+}
+
+function findPharmacy() {
+  try {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      const url = `https://www.google.com/maps/search/pharmacy/@${latitude},${longitude},14z`;
+      speak('Opening nearby pharmacies');
+      window.open(url, '_blank');
+    }, () => {
+      window.open('https://www.google.com/maps/search/pharmacy+near+me', '_blank');
+      speak('Opening pharmacies near you');
+    });
+  } catch (e) {
+    window.open('https://www.google.com/maps/search/pharmacy+near+me', '_blank');
+  }
+}
+
+function callHelp() {
+  const phone = (localStorage.getItem('helpContact') || '').trim();
+  if (phone) {
+    speak('Calling help contact');
+    window.location.href = `tel:${phone}`;
+  } else {
+    speak('No help contact saved. Please enter a phone number.');
+    showBanner('Add a help contact phone number.');
+  }
+}
+
+function speakSchedule() {
+  const a = JSON.parse(localStorage.getItem('appointments') || '[]');
+  const r = JSON.parse(localStorage.getItem('reminders') || '[]');
+  const lines = [];
+  a.forEach(it => lines.push(`Appointment ${new Date(it.when).toLocaleString()}`));
+  r.forEach(it => lines.push(`Medication ${new Date(it.when).toLocaleString()}`));
+  if (!lines.length) speak('No schedule yet'); else speak(lines.join('. '));
 }
 
 function initChips() {
