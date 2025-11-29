@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elderly Voice Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg"></div>
+  <div id="errorBanner" class="banner" hidden></div>
+  <header class="nav">
+    <div class="brand">Elderly Assist</div>
+  </header>
+  <main class="container">
+    <div class="hero">
+      <div id="voiceBubble" class="bubble" aria-hidden="true">
+        <span class="ripple r1"></span>
+        <span class="ripple r2"></span>
+        <span class="ripple r3"></span>
+      </div>
+      <div class="hero-text">
+        <h1>Speak, and we’ll do the rest</h1>
+        <p>Big buttons. Clear voice. No tiny text.</p>
+        <button id="micButton" class="cta">Tap to Speak</button>
+      </div>
+    </div>
+    <p id="supportMsg">Use your voice to book appointments and set medication reminders.</p>
+    <div class="controls">
+      <button id="sayHelp" class="tertiary">Speak Help</button>
+    </div>
+    
+    <div id="status" class="status">
+      <div class="status-row">
+        <span class="label">Status</span>
+        <span id="statusText" class="value">Idle</span>
+      </div>
+      <div class="status-row">
+        <span class="label">Heard</span>
+        <span id="heardText" class="value">—</span>
+      </div>
+    </div>
+    <section class="actions">
+      <button class="action-btn" data-phrase="Book appointment with Dr Smith on December 5 at 3 pm">Book Appointment</button>
+      <button class="action-btn" data-phrase="Remind medication at 8 am">Medication Reminder</button>
+      <button class="action-btn" data-phrase="What can I say">What can I say</button>
+    </section>
+    <section class="cards">
+      <div class="card">
+        <h2>Appointments</h2>
+        <ul id="appointmentsList"></ul>
+      </div>
+      <div class="card">
+        <h2>Medication Reminders</h2>
+        <ul id="remindersList"></ul>
+      </div>
+    </section>
+    <section class="notice" id="supportNotice" hidden>
+      <p>Speech features are not supported on this device. You can still use large buttons, but voice input may not work. Try Chrome.</p>
+    </section>
+    <div id="micOverlay" class="overlay" hidden>
+      <div class="overlay-content">
+        <h2>Microphone Permission Needed</h2>
+        <p>Allow the microphone to speak and be heard. In Chrome, click the mic icon in the address bar and select Allow.</p>
+        <button id="overlayRetry" class="primary">Try Again</button>
+      </div>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
